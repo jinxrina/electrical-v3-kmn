@@ -1,0 +1,2424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SG ElecCalc Pro | Electrical Calculations</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --primary-light: #818cf8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --body-bg: #ffffff;
+            --card-bg: #ffffff;
+            --text-primary: #111827;
+            --text-secondary: #4b5563;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --border: #e5e7eb;
+        }
+
+        [data-theme="dark"] {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #a5b4fc;
+            --body-bg: #111827;
+            --card-bg: #1f2937;
+            --text-primary: #f9fafb;
+            --text-secondary: #e5e7eb;
+            --shadow: rgba(0, 0, 0, 0.4);
+            --border: #374151;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+
+        body {
+            background-color: var(--body-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        header {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            padding: 1rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .logo i {
+            color: var(--primary);
+        }
+
+        nav ul {
+            display: flex;
+            gap: 1.5rem;
+            list-style: none;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+        }
+
+        nav a.active {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: transform 0.3s, color 0.2s;
+        }
+
+        .theme-toggle:hover {
+            color: var(--primary);
+            transform: rotate(30deg);
+        }
+
+        main {
+            padding: 2rem 0;
+        }
+
+        .hero-section {
+            text-align: center;
+            padding: 3rem 1rem;
+            margin-bottom: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, var(--primary-light) 0%, transparent 70%);
+            opacity: 0.1;
+            z-index: -1;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            font-weight: 800;
+            background: linear-gradient(to right, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
+
+        .sg-flag {
+            display: inline-block;
+            margin-left: 0.5rem;
+            font-weight: normal;
+            font-size: 1.25rem;
+        }
+
+        .calculation-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .tab-button {
+            padding: 0.75rem 1.25rem;
+            background-color: var(--card-bg);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            flex: 1 1 auto;
+        }
+
+        .tab-button:hover {
+            border-color: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .tab-button.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+        }
+
+        .calculation-container {
+            background-color: var(--card-bg);
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px var(--shadow);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
+        }
+
+        .calculation-section {
+            display: none;
+        }
+
+        .calculation-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-title i {
+            color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        select,
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            background-color: var(--card-bg);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        select:focus,
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .input-group input {
+            flex: 1;
+        }
+
+        .input-group span {
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .radio-option input {
+            width: auto;
+        }
+
+        .button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .button:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        .button:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        .button::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: -100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.2),
+                transparent
+            );
+            transition: 0.4s;
+        }
+
+        .button:hover::after {
+            left: 100%;
+        }
+
+        .button-reset {
+            background-color: var(--gray-200);
+            color: var(--gray-700);
+        }
+
+        .button-reset:hover {
+            background-color: var(--gray-300);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .button-row {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .result-container {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            background-color: var(--body-bg);
+            border: 1px solid var(--border);
+            display: none;
+        }
+
+        .result-container.active {
+            display: block;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .result-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .result-item {
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .result-label {
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .result-value {
+            font-weight: 600;
+        }
+
+        .accordion {
+            margin-top: 2rem;
+        }
+
+        .accordion-item {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .accordion-header {
+            padding: 1rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .accordion-header i {
+            transition: transform 0.3s;
+        }
+
+        .accordion-item.active .accordion-header i {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .accordion-item.active .accordion-content {
+            max-height: 500px;
+        }
+
+        .accordion-body {
+            padding: 1rem 0 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .reference-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        .reference-table th, 
+        .reference-table td {
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            text-align: left;
+        }
+
+        .reference-table th {
+            background-color: rgba(99, 102, 241, 0.1);
+            font-weight: 600;
+        }
+
+        .reference-table tr:nth-child(even) {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        .info-card {
+            background-color: var(--card-bg);
+            border-radius: 0.75rem;
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-card i {
+            color: var(--primary);
+        }
+
+        .info-card p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .info-card ul {
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-card li {
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .sg-regulation {
+            padding: 0.5rem 1rem;
+            background-color: rgba(99, 102, 241, 0.1);
+            border-left: 4px solid var(--primary);
+            margin: 1rem 0;
+            font-style: italic;
+            color: var(--text-secondary);
+            border-radius: 0 0.5rem 0.5rem 0;
+        }
+
+        footer {
+            background-color: var(--card-bg);
+            padding: 3rem 0;
+            border-top: 1px solid var(--border);
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .footer-logo {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .footer-logo .logo {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-logo p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .footer-links h3 {
+            font-size: 1.125rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            background-color: rgba(99, 102, 241, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            transition: all 0.2s;
+        }
+
+        .social-links a:hover {
+            background-color: var(--primary);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            margin-top: 3rem;
+            text-align: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        /* Lighting design specific styles */
+        .room-canvas-container {
+            width: 100%;
+            height: 300px;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #room-canvas {
+            width: 100%;
+            height: 100%;
+            background-color: var(--body-bg);
+        }
+
+        .dimension-input {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        /* Fault calculation specific styles */
+        .fault-diagram {
+            width: 100%;
+            height: 200px;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+            }
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        /* Responsive styles */
+        @media (min-width: 768px) {
+            .hero-title {
+                font-size: 3rem;
+            }
+            
+            .two-columns {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .footer-content {
+                grid-template-columns: 2fr 1fr 1fr;
+            }
+            
+            .calculation-tabs {
+                flex-wrap: nowrap;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .logo {
+                font-size: 1.25rem;
+            }
+            
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .calculation-container {
+                padding: 1.5rem;
+            }
+            
+            .button-row {
+                flex-direction: column;
+            }
+            
+            .button {
+                width: 100%;
+            }
+        }
+
+        /* Special animated elements */
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* Circuit animation specific styles */
+        .circuit-animation {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.05;
+            pointer-events: none;
+        }
+
+        .circuit-path {
+            position: absolute;
+            background-color: var(--primary);
+            height: 2px;
+            width: 50px;
+            transform-origin: left center;
+        }
+
+        .circuit-node {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: var(--primary);
+        }
+
+        .traveling-pulse {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px 2px var(--primary-light);
+        }
+
+        /* Loading animation */
+        .loading-spinner {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(99, 102, 241, 0.1);
+            border-left-color: var(--primary);
+            border-radius: 50%;
+            animation: spinner 1s linear infinite;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes spinner {
+            to {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            position: absolute;
+            bottom: -30px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="circuit-animation" id="circuit-animation"></div>
+    
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-bolt"></i>
+                    <span>SG ElecCalc Pro</span>
+                </div>
+                <nav class="nav-links">
+                    <ul>
+                        <li><a href="#" class="active">Home</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#regulations">SG Regulations</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </nav>
+                <button class="theme-toggle" id="theme-toggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero-section">
+            <h1 class="hero-title">Singapore Electrical Calculations <span class="sg-flag">🇸🇬</span></h1>
+            <p class="hero-subtitle">Professional electrical calculations for cable sizing, circuit breaker selection, lighting design, and fault analysis based on Singapore's Code of Practice.</p>
+        </section>
+
+        <div class="calculation-tabs" id="calc-tabs">
+            <button class="tab-button active" data-tab="wire-sizing">
+                <i class="fas fa-plug"></i> Wire Sizing
+            </button>
+            <button class="tab-button" data-tab="breaker-sizing">
+                <i class="fas fa-shield-alt"></i> Circuit Breaker
+            </button>
+            <button class="tab-button" data-tab="lighting-design">
+                <i class="fas fa-lightbulb"></i> Lighting Design
+            </button>
+            <button class="tab-button" data-tab="fault-calculation">
+                <i class="fas fa-exclamation-triangle"></i> Fault Calculation
+            </button>
+        </div>
+
+        <div class="calculation-container">
+            <!-- Wire Sizing Section -->
+            <div class="calculation-section active" id="wire-sizing">
+                <h2 class="section-title"><i class="fas fa-plug"></i> Wire/Cable Size Calculator</h2>
+                <div class="two-columns">
+                    <div>
+                        <div class="form-group">
+                            <label for="application-type">Application Type</label>
+                            <select id="application-type">
+                                <option value="residential">Residential</option>
+                                <option value="commercial">Commercial</option>
+                                <option value="office">Office</option>
+                                <option value="school">School</option>
+                                <option value="industrial">Industrial</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="load-current">Load Current (A)</label>
+                            <input type="number" id="load-current" min="0" step="0.1" placeholder="Enter load current">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="voltage">Voltage (V)</label>
+                            <select id="voltage">
+                                <option value="230">230V (Single Phase)</option>
+                                <option value="400">400V (Three Phase)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="cable-length">Cable Length (m)</label>
+                            <input type="number" id="cable-length" min="1" step="1" placeholder="Enter cable length">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="form-group">
+                            <label for="installation-method">Installation Method</label>
+                            <select id="installation-method">
+                                <option value="conduit">Enclosed in Conduit</option>
+                                <option value="trunking">Cable Trunking</option>
+                                <option value="direct">Direct Burial</option>
+                                <option value="free-air">Free Air/Cable Tray</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="ambient-temp">Ambient Temperature (°C)</label>
+                            <input type="number" id="ambient-temp" value="30" min="0" max="60" step="1">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="voltage-drop">Maximum Allowable Voltage Drop (%)</label>
+                            <input type="number" id="voltage-drop" value="2.5" min="0" max="10" step="0.1">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Conductor Material</label>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" name="conductor" value="copper" checked>
+                                    Copper
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="conductor" value="aluminum">
+                                    Aluminum
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="button-row">
+                    <button class="button" id="calculate-wire">
+                        <i class="fas fa-calculator"></i> Calculate
+                    </button>
+                    <button class="button button-reset" id="reset-wire">
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                </div>
+                
+                <div class="result-container" id="wire-sizing-result">
+                    <h3 class="result-title"><i class="fas fa-check-circle"></i> Calculation Results</h3>
+                    <div class="result-item">
+                        <span class="result-label">Minimum Cable Size:</span>
+                        <span class="result-value" id="cable-size">6.0 mm²</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Current Carrying Capacity:</span>
+                        <span class="result-value" id="current-capacity">45 A</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Voltage Drop:</span>
+                        <span class="result-value" id="actual-voltage-drop">1.8 %</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Recommended Cable Type:</span>
+                        <span class="result-value" id="cable-type">PVC Insulated, 3-core (P+N+E)</span>
+                    </div>
+                    
+                    <div class="accordion">
+                        <div class="accordion-item">
+                            <div class="accordion-header">
+                                <span>Singapore Regulations Reference</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="accordion-content">
+                                <div class="accordion-body">
+                                    <p>According to Singapore's Code of Practice CP5:2018:</p>
+                                    <ul>
+                                        <li>For residential installations, the maximum voltage drop should not exceed 2.5% of nominal voltage.</li>
+                                        <li>All cables must be sized to carry the design current while considering correction factors for ambient temperature and grouping.</li>
+                                        <li>Protective devices must be selected to protect against overload and short circuit conditions.</li>
+                                    </ul>
+                                    <p class="sg-regulation">
+                                        "The nominal cross-sectional area of conductors shall be not less than the values specified in SS 638." - CP5:2018 Section 5.1.2
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Circuit Breaker Section -->
+            <div class="calculation-section" id="breaker-sizing">
+                <h2 class="section-title"><i class="fas fa-shield-alt"></i> Circuit Breaker Sizing Calculator</h2>
+                <div class="two-columns">
+                    <div>
+                        <div class="form-group">
+                            <label for="cb-application">Application Type</label>
+                            <select id="cb-application">
+                                <option value="residential">Residential</option>
+                                <option value="commercial">Commercial</option>
+                                <option value="office">Office</option>
+                                <option value="school">School</option>
+                                <option value="industrial">Industrial</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="cb-load-type">Load Type</label>
+                            <select id="cb-load-type">
+                                <option value="lighting">Lighting Circuits</option>
+                                <option value="socket">Socket Outlets</option>
+                                <option value="fixed">Fixed Appliances</option>
+                                <option value="motor">Motor Loads</option>
+                                <option value="aircon">Air Conditioning</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="cb-load-current">Load Current (A)</label>
+                            <input type="number" id="cb-load-current" min="0" step="0.1" placeholder="Enter load current">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="cb-voltage">Voltage (V)</label>
+                            <select id="cb-voltage">
+                                <option value="230">230V (Single Phase)</option>
+                                <option value="400">400V (Three Phase)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="form-group">
+                            <label for="cable-size-selected">Cable Size (mm²)</label>
+                            <select id="cable-size-selected">
+                                <option value="1.5">1.5 mm²</option>
+                                <option value="2.5">2.5 mm²</option>
+                                <option value="4">4.0 mm²</option>
+                                <option value="6">6.0 mm²</option>
+                                <option value="10">10.0 mm²</option>
+                                <option value="16">16.0 mm²</option>
+                                <option value="25">25.0 mm²</option>
+                                <option value="35">35.0 mm²</option>
+                                <option value="50">50.0 mm²</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="starting-current">Starting Current Factor (for Motors)</label>
+                            <input type="number" id="starting-current" value="6" min="1" max="10" step="0.1">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>RCD (ELCB) Protection Required?</label>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" name="rcd" value="yes" checked>
+                                    Yes
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="rcd" value="no">
+                                    No
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Circuit Type</label>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" name="circuit-type" value="final" checked>
+                                    Final Circuit
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="circuit-type" value="distribution">
+                                    Distribution Circuit
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="button-row">
+                    <button class="button" id="calculate-breaker">
+                        <i class="fas fa-calculator"></i> Calculate
+                    </button>
+                    <button class="button button-reset" id="reset-breaker">
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                </div>
+                
+                <div class="result-container" id="breaker-sizing-result">
+                    <h3 class="result-title"><i class="fas fa-check-circle"></i> Circuit Breaker Selection</h3>
+                    <div class="result-item">
+                        <span class="result-label">Recommended Circuit Breaker Rating:</span>
+                        <span class="result-value" id="breaker-rating">20 A</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Circuit Breaker Type:</span>
+                        <span class="result-value" id="breaker-type">MCB Type C</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">RCD Protection:</span>
+                        <span class="result-value" id="rcd-protection">30mA RCCB/RCBO</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Maximum Load Current:</span>
+                        <span class="result-value" id="max-load-current">16 A</span>
+                    </div>
+                    
+                    <div class="accordion">
+                        <div class="accordion-item">
+                            <div class="accordion-header">
+                                <span>Singapore Regulations Reference</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="accordion-content">
+                                <div class="accordion-body">
+                                    <p>According to Singapore's Code of Practice CP5:2018:</p>
+                                    <ul>
+                                        <li>RCDs with a rated residual operating current not exceeding 30mA are required for socket outlets and lighting circuits in residential premises.</li>
+                                        <li>Selection of circuit breakers must consider both the load current and cable protection requirements.</li>
+                                        <li>MCB types (B, C, or D) should be selected based on the load characteristics.</li>
+                                    </ul>
+                                    <p class="sg-regulation">
+                                        "Every final socket-outlet circuit shall be protected by an RCD with a rated residual operating current not exceeding 30mA." - CP5:2018 Section 7.1.2
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Lighting Design Section -->
+            <div class="calculation-section" id="lighting-design">
+                <h2 class="section-title"><i class="fas fa-lightbulb"></i> Lighting Design Calculator</h2>
+                <div class="two-columns">
+                    <div>
+                        <div class="form-group">
+                            <label for="room-type">Room Type</label>
+                            <select id="room-type">
+                                <option value="living">Living Room</option>
+                                <option value="bedroom">Bedroom</option>
+                                <option value="kitchen">Kitchen</option>
+                                <option value="bathroom">Bathroom</option>
+                                <option value="office">Office Space</option>
+                                <option value="classroom">Classroom</option>
+                                <option value="corridor">Corridor</option>
+                                <option value="retail">Retail Space</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Room Dimensions (m)</label>
+                            <div class="dimension-input">
+                                <div class="input-group">
+                                    <input type="number" id="room-length" min="1" step="0.1" placeholder="Length" value="6">
+                                    <span>m</span>
+                                </div>
+                                <div class="input-group">
+                                    <input type="number" id="room-width" min="1" step="0.1" placeholder="Width" value="4">
+                                    <span>m</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="ceiling-height">Ceiling Height (m)</label>
+                            <div class="input-group">
+                                <input type="number" id="ceiling-height" min="2" max="6" step="0.1" value="2.8">
+                                <span>m</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="work-plane">Work Plane Height (m)</label>
+                            <div class="input-group">
+                                <input type="number" id="work-plane" min="0" max="1.5" step="0.1" value="0.8">
+                                <span>m</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="form-group">
+                            <label for="target-illuminance">Target Illuminance (lux)</label>
+                            <input type="number" id="target-illuminance" min="50" max="1000" step="10" value="300">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="luminaire-type">Luminaire Type</label>
+                            <select id="luminaire-type">
+                                <option value="led-panel">LED Panel (36W, 3600lm)</option>
+                                <option value="led-downlight">LED Downlight (12W, 1000lm)</option>
+                                <option value="fluorescent">Fluorescent Tube (28W, 2600lm)</option>
+                                <option value="led-tube">LED Tube (18W, 2000lm)</option>
+                                <option value="high-bay">High Bay (150W, 18000lm)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="maintenance-factor">Maintenance Factor</label>
+                            <select id="maintenance-factor">
+                                <option value="0.8">Clean Environment (0.8)</option>
+                                <option value="0.7" selected>Normal Environment (0.7)</option>
+                                <option value="0.6">Dirty Environment (0.6)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="reflectance">Room Surface Reflectance</label>
+                            <select id="reflectance">
+                                <option value="high">High (Ceiling: 0.8, Walls: 0.7, Floor: 0.3)</option>
+                                <option value="medium" selected>Medium (Ceiling: 0.7, Walls: 0.5, Floor: 0.2)</option>
+                                <option value="low">Low (Ceiling: 0.5, Walls: 0.3, Floor: 0.1)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="room-canvas-container">
+                    <canvas id="room-canvas"></canvas>
+                    <div class="loading-spinner" id="lighting-spinner">
+                        <div class="loading-text">Calculating lighting layout...</div>
+                    </div>
+                </div>
+                
+                <div class="button-row">
+                    <button class="button" id="calculate-lighting">
+                        <i class="fas fa-calculator"></i> Calculate
+                    </button>
+                    <button class="button button-reset" id="reset-lighting">
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                </div>
+                
+                <div class="result-container" id="lighting-design-result">
+                    <h3 class="result-title"><i class="fas fa-check-circle"></i> Lighting Design Results</h3>
+                    <div class="result-item">
+                        <span class="result-label">Number of Luminaires Required:</span>
+                        <span class="result-value" id="luminaire-count">9 units</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Luminaire Layout:</span>
+                        <span class="result-value" id="luminaire-layout">3 × 3 grid</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Average Achieved Illuminance:</span>
+                        <span class="result-value" id="achieved-illuminance">320 lux</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Power Density:</span>
+                        <span class="result-value" id="power-density">13.5 W/m²</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Total Connected Load:</span>
+                        <span class="result-value" id="total-lighting-load">324 W</span>
+                    </div>
+                    
+                    <div class="accordion">
+                        <div class="accordion-item">
+                            <div class="accordion-header">
+                                <span>Singapore Regulations Reference</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="accordion-content">
+                                <div class="accordion-body">
+                                    <p>According to Singapore Standards SS531 and SS530:</p>
+                                    <ul>
+                                        <li>Minimum illuminance levels for residential spaces: Living rooms (100-300 lux), Kitchens (300-500 lux), Bedrooms (100-200 lux)</li>
+                                        <li>Minimum illuminance levels for offices: General office areas (500 lux), Conference rooms (300-500 lux), Corridors (100 lux)</li>
+                                        <li>Maximum lighting power density requirements in SS530 aim to promote energy efficiency.</li>
+                                    </ul>
+                                    <p class="sg-regulation">
+                                        "The lighting in buildings shall be designed and installed to provide adequate illumination for the intended use of the building." - SS531
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Fault Calculation Section -->
+            <div class="calculation-section" id="fault-calculation">
+                <h2 class="section-title"><i class="fas fa-exclamation-triangle"></i> Electrical Fault Calculator</h2>
+                <div class="two-columns">
+                    <div>
+                        <div class="form-group">
+                            <label for="fault-type">Fault Type</label>
+                            <select id="fault-type">
+                                <option value="short-circuit">Short Circuit Fault</option>
+                                <option value="earth-fault">Earth Fault</option>
+                                <option value="phase-fault">Phase-to-Phase Fault</option>
+                                <option value="arc-fault">Arc Fault</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="system-voltage">System Voltage (V)</label>
+                            <select id="system-voltage">
+                                <option value="230">230V (Single Phase)</option>
+                                <option value="400">400V (Three Phase)</option>
+                                <option value="11000">11kV</option>
+                                <option value="22000">22kV</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="fault-location">Fault Location</label>
+                            <select id="fault-location">
+                                <option value="main-db">Main Distribution Board</option>
+                                <option value="sub-db">Sub Distribution Board</option>
+                                <option value="final-circuit">Final Circuit</option>
+                                <option value="equipment">Equipment Terminal</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="transformer-rating">Transformer Rating (kVA)</label>
+                            <input type="number" id="transformer-rating" min="50" max="2000" step="50" value="500">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="form-group">
+                            <label for="transformer-impedance">Transformer Impedance (%)</label>
+                            <input type="number" id="transformer-impedance" min="3" max="10" step="0.1" value="5">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="cable-length-fault">Cable Length to Fault Point (m)</label>
+                            <input type="number" id="cable-length-fault" min="1" max="1000" step="1" value="50">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="cable-size-fault">Cable Size (mm²)</label>
+                            <select id="cable-size-fault">
+                                <option value="1.5">1.5 mm²</option>
+                                <option value="2.5">2.5 mm²</option>
+                                <option value="4">4.0 mm²</option>
+                                <option value="6">6.0 mm²</option>
+                                <option value="10">10.0 mm²</option>
+                                <option value="16">16.0 mm²</option>
+                                <option value="25" selected>25.0 mm²</option>
+                                <option value="35">35.0 mm²</option>
+                                <option value="50">50.0 mm²</option>
+                                <option value="95">95.0 mm²</option>
+                                <option value="150">150.0 mm²</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="grid-contribution">Grid Fault Level Contribution (kA)</label>
+                            <input type="number" id="grid-contribution" min="5" max="50" step="1" value="15">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="fault-diagram" id="fault-diagram">
+                    <div class="loading-spinner" id="fault-spinner"></div>
+                </div>
+                
+                <div class="button-row">
+                    <button class="button" id="calculate-fault">
+                        <i class="fas fa-calculator"></i> Calculate
+                    </button>
+                    <button class="button button-reset" id="reset-fault">
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                </div>
+                
+                <div class="result-container" id="fault-calculation-result">
+                    <h3 class="result-title"><i class="fas fa-check-circle"></i> Fault Calculation Results</h3>
+                    <div class="result-item">
+                        <span class="result-label">Prospective Short Circuit Current:</span>
+                        <span class="result-value" id="fault-current">12.8 kA</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Max Thermal Stress on Cable:</span>
+                        <span class="result-value" id="thermal-stress">24.5 kA² s</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Minimum Breaking Capacity Required:</span>
+                        <span class="result-value" id="breaking-capacity">16 kA</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Fault Clearance Time:</span>
+                        <span class="result-value" id="clearance-time">0.08 s</span>
+                    </div>
+                    
+                    <div class="accordion">
+                        <div class="accordion-item">
+                            <div class="accordion-header">
+                                <span>Singapore Regulations Reference</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="accordion-content">
+                                <div class="accordion-body">
+                                    <p>According to Singapore's Code of Practice CP5:2018:</p>
+                                    <ul>
+                                        <li>Protection devices must have adequate breaking capacity for the prospective short-circuit current at the point of installation.</li>
+                                        <li>Earth fault loop impedance must be low enough to allow sufficient fault current to flow to operate the protective device within the required time.</li>
+                                        <li>Conductors must be protected against thermal effects of short-circuits and faults.</li>
+                                    </ul>
+                                    <p class="sg-regulation">
+                                        "Every overcurrent protective device shall have a breaking capacity not less than the prospective short-circuit current at the point where the device is installed." - CP5:2018 Section 5.3.5
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section class="info-card" id="about">
+            <h2 class="info-card-title"><i class="fas fa-info-circle"></i> About SG ElecCalc Pro</h2>
+            <p>SG ElecCalc Pro is a comprehensive electrical calculation tool specifically designed for Singapore's electrical standards and Code of Practice. Our tool provides accurate calculations for:</p>
+            <ul>
+                <li><strong>Cable Sizing:</strong> Determine the appropriate wire and cable sizes based on load current, voltage drop, and installation method.</li>
+                <li><strong>Circuit Breaker Selection:</strong> Calculate the correct circuit breaker ratings and types for various applications.</li>
+                <li><strong>Lighting Design:</strong> Plan efficient lighting layouts and determine the right number of luminaires for any space.</li>
+                <li><strong>Fault Analysis:</strong> Calculate prospective fault currents and ensure safety through proper protection coordination.</li>
+            </ul>
+            <p>All calculations follow the Singapore Standards and Code of Practice for electrical installations, ensuring compliance with local regulations.</p>
+        </section>
+
+        <section class="info-card" id="regulations">
+            <h2 class="info-card-title"><i class="fas fa-book"></i> Singapore Electrical Regulations</h2>
+            <p>All calculations in this tool are based on the following Singapore standards:</p>
+            <ul>
+                <li><strong>CP5:2018:</strong> Code of Practice for Electrical Installations</li>
+                <li><strong>SS 638:</strong> Electrical cables - Cables for power and general applications</li>
+                <li><strong>SS 531:</strong> Code of Practice for Lighting of Work Places</li>
+                <li><strong>SS 530:</strong> Energy Efficiency Standard for Building Services and Equipment</li>
+                <li><strong>SS CP 88:</strong> Code of Practice for Temporary Electrical Installations</li>
+            </ul>
+            <p>These standards ensure that electrical installations in Singapore are safe, reliable, and efficient. Our calculations comply with the latest amendments and revisions of these standards.</p>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <div class="logo">
+                        <i class="fas fa-bolt"></i>
+                        <span>SG ElecCalc Pro</span>
+                    </div>
+                    <p>Professional electrical calculations following Singapore standards and Code of Practice for electrical installations.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#wire-sizing">Wire Sizing Calculator</a></li>
+                        <li><a href="#breaker-sizing">Circuit Breaker Calculator</a></li>
+                        <li><a href="#lighting-design">Lighting Design Calculator</a></li>
+                        <li><a href="#fault-calculation">Fault Calculator</a></li>
+                        <li><a href="#regulations">Singapore Regulations</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links" id="contact">
+                    <h3>Contact</h3>
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> <a href="mailto:info@sgeleccalc.com">info@sgeleccalc.com</a></li>
+                        <li><i class="fas fa-phone"></i> <a href="tel:+6565557890">+65 6555 7890</a></li>
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Electrical Avenue, Singapore</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 SG ElecCalc Pro. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Theme Toggle Functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const htmlElement = document.documentElement;
+        
+        // Check for saved theme preference or use system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+            htmlElement.setAttribute('data-theme', 'dark');
+            themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        } else {
+            htmlElement.setAttribute('data-theme', 'light');
+            themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = htmlElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            htmlElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            if (newTheme === 'dark') {
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            } else {
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+            }
+        });
+
+        // Tab Switching Functionality
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const calcSections = document.querySelectorAll('.calculation-section');
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const tabId = button.getAttribute('data-tab');
+                
+                // Remove active class from all buttons and sections
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                calcSections.forEach(section => section.classList.remove('active'));
+                
+                // Add active class to clicked button and corresponding section
+                button.classList.add('active');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // Accordion Functionality
+        const accordionHeaders = document.querySelectorAll('.accordion-header');
+        
+        accordionHeaders.forEach(header => {
+            header.addEventListener('click', () => {
+                const accordionItem = header.parentElement;
+                accordionItem.classList.toggle('active');
+            });
+        });
+
+        // Circuit Animation
+        const circuitAnimation = document.getElementById('circuit-animation');
+        
+        function createCircuitAnimation() {
+            // Clear previous animation
+            circuitAnimation.innerHTML = '';
+            
+            // Number of circuit paths to create
+            const pathCount = 15;
+            
+            for (let i = 0; i < pathCount; i++) {
+                // Create circuit path
+                const path = document.createElement('div');
+                path.className = 'circuit-path';
+                
+                // Random position and rotation
+                const posX = Math.random() * 100;
+                const posY = Math.random() * 100;
+                const rotation = Math.random() * 360;
+                const length = 30 + Math.random() * 100;
+                
+                // Apply styles
+                path.style.left = `${posX}%`;
+                path.style.top = `${posY}%`;
+                path.style.width = `${length}px`;
+                path.style.transform = `rotate(${rotation}deg)`;
+                
+                // Create circuit node at start of path
+                const nodeStart = document.createElement('div');
+                nodeStart.className = 'circuit-node';
+                nodeStart.style.left = `${posX}%`;
+                nodeStart.style.top = `${posY}%`;
+                
+                // Create circuit node at end of path
+                const nodeEnd = document.createElement('div');
+                nodeEnd.className = 'circuit-node';
+                
+                // Calculate end position based on path length and rotation
+                const radians = rotation * (Math.PI / 180);
+                const endX = posX + (length / window.innerWidth * 100) * Math.cos(radians);
+                const endY = posY + (length / window.innerHeight * 100) * Math.sin(radians);
+                
+                nodeEnd.style.left = `${endX}%`;
+                nodeEnd.style.top = `${endY}%`;
+                
+                // Add elements to animation
+                circuitAnimation.appendChild(path);
+                circuitAnimation.appendChild(nodeStart);
+                circuitAnimation.appendChild(nodeEnd);
+                
+                // Create traveling pulse for some paths
+                if (Math.random() > 0.7) {
+                    const pulse = document.createElement('div');
+                    pulse.className = 'traveling-pulse';
+                    
+                    // Animation for pulse
+                    const animDuration = 2 + Math.random() * 4;
+                    pulse.style.animationDuration = `${animDuration}s`;
+                    
+                    // Add to animation
+                    circuitAnimation.appendChild(pulse);
+                    
+                    // Animate pulse along the path
+                    animatePulse(pulse, posX, posY, endX, endY, animDuration);
+                }
+            }
+        }
+        
+        function animatePulse(pulse, startX, startY, endX, endY, duration) {
+            let start = null;
+            const animate = (timestamp) => {
+                if (!start) start = timestamp;
+                const progress = (timestamp - start) / (duration * 1000);
+                
+                if (progress >= 1) {
+                    // Restart animation
+                    start = null;
+                    requestAnimationFrame(animate);
+                    return;
+                }
+                
+                // Calculate current position
+                const x = startX + (endX - startX) * progress;
+                const y = startY + (endY - startY) * progress;
+                
+                // Update pulse position
+                pulse.style.left = `${x}%`;
+                pulse.style.top = `${y}%`;
+                
+                requestAnimationFrame(animate);
+            };
+            
+            requestAnimationFrame(animate);
+        }
+        
+        // Initialize circuit animation
+        createCircuitAnimation();
+        
+        // Update circuit animation on resize
+        window.addEventListener('resize', createCircuitAnimation);
+
+        // Wire Sizing Calculator
+        const calculateWireBtn = document.getElementById('calculate-wire');
+        const resetWireBtn = document.getElementById('reset-wire');
+        const wireSizingResult = document.getElementById('wire-sizing-result');
+        
+        calculateWireBtn.addEventListener('click', () => {
+            // Add pulse animation to button
+            calculateWireBtn.classList.add('pulse-animation');
+            
+            // Simulate calculation delay
+            setTimeout(() => {
+                // Show results
+                wireSizingResult.classList.add('active');
+                
+                // Remove pulse animation
+                calculateWireBtn.classList.remove('pulse-animation');
+                
+                // Simulate calculated values (would be actual calculations in real implementation)
+                const loadCurrent = parseFloat(document.getElementById('load-current').value) || 20;
+                const appType = document.getElementById('application-type').value;
+                const cableLength = parseFloat(document.getElementById('cable-length').value) || 30;
+                const installMethod = document.getElementById('installation-method').value;
+                
+                // Update result fields
+                let cableSize, currentCapacity, voltDrop, cableType;
+                
+                if (loadCurrent <= 16) {
+                    cableSize = "2.5";
+                    currentCapacity = "20";
+                    voltDrop = (0.018 * loadCurrent * cableLength / 2.5).toFixed(1);
+                    cableType = "PVC Insulated, 3-core (P+N+E)";
+                } else if (loadCurrent <= 25) {
+                    cableSize = "4.0";
+                    currentCapacity = "28";
+                    voltDrop = (0.018 * loadCurrent * cableLength / 4).toFixed(1);
+                    cableType = "PVC Insulated, 3-core (P+N+E)";
+                } else if (loadCurrent <= 32) {
+                    cableSize = "6.0";
+                    currentCapacity = "36";
+                    voltDrop = (0.018 * loadCurrent * cableLength / 6).toFixed(1);
+                    cableType = "PVC Insulated, 3-core (P+N+E)";
+                } else if (loadCurrent <= 50) {
+                    cableSize = "10.0";
+                    currentCapacity = "50";
+                    voltDrop = (0.018 * loadCurrent * cableLength / 10).toFixed(1);
+                    cableType = "PVC Insulated, 3-core (P+N+E)";
+                } else {
+                    cableSize = "16.0";
+                    currentCapacity = "68";
+                    voltDrop = (0.018 * loadCurrent * cableLength / 16).toFixed(1);
+                    cableType = "PVC Insulated, 4-core (3P+E)";
+                }
+                
+                document.getElementById('cable-size').textContent = `${cableSize} mm²`;
+                document.getElementById('current-capacity').textContent = `${currentCapacity} A`;
+                document.getElementById('actual-voltage-drop').textContent = `${voltDrop} %`;
+                document.getElementById('cable-type').textContent = cableType;
+            }, 800);
+        });
+        
+        resetWireBtn.addEventListener('click', () => {
+            // Reset form fields
+            document.getElementById('load-current').value = '';
+            document.getElementById('cable-length').value = '';
+            document.getElementById('ambient-temp').value = '30';
+            document.getElementById('voltage-drop').value = '2.5';
+            
+            // Hide results
+            wireSizingResult.classList.remove('active');
+        });
+
+        // Circuit Breaker Calculator
+        const calculateBreakerBtn = document.getElementById('calculate-breaker');
+        const resetBreakerBtn = document.getElementById('reset-breaker');
+        const breakerSizingResult = document.getElementById('breaker-sizing-result');
+        
+        calculateBreakerBtn.addEventListener('click', () => {
+            // Add pulse animation to button
+            calculateBreakerBtn.classList.add('pulse-animation');
+            
+            // Simulate calculation delay
+            setTimeout(() => {
+                // Show results
+                breakerSizingResult.classList.add('active');
+                
+                // Remove pulse animation
+                calculateBreakerBtn.classList.remove('pulse-animation');
+                
+                // Simulate calculated values (would be actual calculations in real implementation)
+                const loadCurrent = parseFloat(document.getElementById('cb-load-current').value) || 16;
+                const loadType = document.getElementById('cb-load-type').value;
+                const cableSize = document.getElementById('cable-size-selected').value;
+                const rcdRequired = document.querySelector('input[name="rcd"]:checked').value;
+                
+                // Update result fields
+                let breakerRating, breakerType, rcdProtection, maxLoad;
+                
+                if (loadType === 'motor') {
+                    const startingFactor = parseFloat(document.getElementById('starting-current').value) || 6;
+                    breakerRating = Math.ceil(loadCurrent * 1.5 / 5) * 5;
+                    breakerType = "MCB Type D";
+                    maxLoad = Math.floor(breakerRating * 0.8);
+                } else if (loadType === 'aircon') {
+                    breakerRating = Math.ceil(loadCurrent * 1.25 / 5) * 5;
+                    breakerType = "MCB Type C";
+                    maxLoad = Math.floor(breakerRating * 0.8);
+                } else {
+                    breakerRating = Math.ceil(loadCurrent * 1.1 / 5) * 5;
+                    breakerType = loadType === 'lighting' ? "MCB Type B" : "MCB Type C";
+                    maxLoad = Math.floor(breakerRating * 0.8);
+                }
+                
+                rcdProtection = rcdRequired === 'yes' ? 
+                    "30mA RCCB/RCBO" : 
+                    "Not Required (Per SG Regulations)";
+                
+                document.getElementById('breaker-rating').textContent = `${breakerRating} A`;
+                document.getElementById('breaker-type').textContent = breakerType;
+                document.getElementById('rcd-protection').textContent = rcdProtection;
+                document.getElementById('max-load-current').textContent = `${maxLoad} A`;
+            }, 800);
+        });
+        
+        resetBreakerBtn.addEventListener('click', () => {
+            // Reset form fields
+            document.getElementById('cb-load-current').value = '';
+            document.getElementById('starting-current').value = '6';
+            
+            // Hide results
+            breakerSizingResult.classList.remove('active');
+        });
+
+        // Lighting Design Calculator
+        const calculateLightingBtn = document.getElementById('calculate-lighting');
+        const resetLightingBtn = document.getElementById('reset-lighting');
+        const lightingDesignResult = document.getElementById('lighting-design-result');
+        const roomCanvas = document.getElementById('room-canvas');
+        const lightingSpinner = document.getElementById('lighting-spinner');
+        const ctx = roomCanvas.getContext('2d');
+        
+        // Set canvas dimensions
+        function resizeCanvas() {
+            const container = roomCanvas.parentElement;
+            roomCanvas.width = container.clientWidth;
+            roomCanvas.height = container.clientHeight;
+        }
+        
+        // Initialize canvas
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Draw room with lighting layout
+        function drawRoom(length, width, luminaireCount, rows, cols) {
+            // Clear canvas
+            ctx.clearRect(0, 0, roomCanvas.width, roomCanvas.height);
+            
+            // Set scaling factor
+            const maxDimension = Math.max(length, width);
+            const scale = (roomCanvas.width * 0.8) / maxDimension;
+            
+            // Calculate room dimensions in pixels
+            const roomWidth = width * scale;
+            const roomLength = length * scale;
+            
+            // Calculate room position (centered)
+            const roomX = (roomCanvas.width - roomWidth) / 2;
+            const roomY = (roomCanvas.height - roomLength) / 2;
+            
+            // Get theme variables for colors
+            const isDarkTheme = document.documentElement.getAttribute('data-theme') === 'dark';
+            const roomColor = isDarkTheme ? '#374151' : '#f3f4f6';
+            const wallColor = isDarkTheme ? '#4b5563' : '#d1d5db';
+            const textColor = isDarkTheme ? '#e5e7eb' : '#111827';
+            const luminaireColor = '#6366f1';
+            const luminaireGlow = isDarkTheme ? 'rgba(99, 102, 241, 0.3)' : 'rgba(99, 102, 241, 0.15)';
+            
+            // Draw room floor
+            ctx.fillStyle = roomColor;
+            ctx.fillRect(roomX, roomY, roomWidth, roomLength);
+            
+            // Draw room walls
+            ctx.strokeStyle = wallColor;
+            ctx.lineWidth = 4;
+            ctx.strokeRect(roomX, roomY, roomWidth, roomLength);
+            
+            // Draw room dimensions
+            ctx.fillStyle = textColor;
+            ctx.font = '14px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            
+            // Width dimension
+            ctx.fillText(`${width}m`, roomX + roomWidth / 2, roomY - 10);
+            
+            // Length dimension
+            ctx.save();
+            ctx.translate(roomX - 10, roomY + roomLength / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.fillText(`${length}m`, 0, 0);
+            ctx.restore();
+            
+            // If we have a valid luminaire layout
+            if (luminaireCount > 0 && rows > 0 && cols > 0) {
+                // Calculate luminaire spacing
+                const spacingX = roomWidth / cols;
+                const spacingY = roomLength / rows;
+                const offsetX = spacingX / 2;
+                const offsetY = spacingY / 2;
+                
+                // Draw luminaires
+                for (let r = 0; r < rows; r++) {
+                    for (let c = 0; c < cols; c++) {
+                        const luminaireIndex = r * cols + c;
+                        if (luminaireIndex < luminaireCount) {
+                            const x = roomX + offsetX + c * spacingX;
+                            const y = roomY + offsetY + r * spacingY;
+                            
+                            // Draw luminaire glow
+                            ctx.beginPath();
+                            ctx.fillStyle = luminaireGlow;
+                            ctx.arc(x, y, 20, 0, Math.PI * 2);
+                            ctx.fill();
+                            
+                            // Draw luminaire
+                            ctx.beginPath();
+                            ctx.fillStyle = luminaireColor;
+                            ctx.arc(x, y, 6, 0, Math.PI * 2);
+                            ctx.fill();
+                            ctx.strokeStyle = '#4f46e5';
+                            ctx.lineWidth = 2;
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+        }
+        
+        calculateLightingBtn.addEventListener('click', () => {
+            // Show loading spinner
+            lightingSpinner.style.display = 'block';
+            
+            // Add pulse animation to button
+            calculateLightingBtn.classList.add('pulse-animation');
+            
+            // Simulate calculation delay
+            setTimeout(() => {
+                // Get form values
+                const roomLength = parseFloat(document.getElementById('room-length').value) || 6;
+                const roomWidth = parseFloat(document.getElementById('room-width').value) || 4;
+                const roomHeight = parseFloat(document.getElementById('ceiling-height').value) || 2.8;
+                const targetIlluminance = parseFloat(document.getElementById('target-illuminance').value) || 300;
+                const roomType = document.getElementById('room-type').value;
+                const luminaireType = document.getElementById('luminaire-type').value;
+                
+                // Calculate number of luminaires (simplified calculation for demonstration)
+                let luminaireCount, rows, cols;
+                let luminaireWattage, luminaireFlux;
+                
+                switch (luminaireType) {
+                    case 'led-panel':
+                        luminaireWattage = 36;
+                        luminaireFlux = 3600;
+                        break;
+                    case 'led-downlight':
+                        luminaireWattage = 12;
+                        luminaireFlux = 1000;
+                        break;
+                    case 'fluorescent':
+                        luminaireWattage = 28;
+                        luminaireFlux = 2600;
+                        break;
+                    case 'led-tube':
+                        luminaireWattage = 18;
+                        luminaireFlux = 2000;
+                        break;
+                    case 'high-bay':
+                        luminaireWattage = 150;
+                        luminaireFlux = 18000;
+                        break;
+                }
+                
+                // Calculate room index (simplified)
+                const roomArea = roomLength * roomWidth;
+                const roomIndex = (roomLength * roomWidth) / ((roomLength + roomWidth) * roomHeight);
+                
+                // Get utilization factor based on room index (simplified)
+                let utilizationFactor;
+                if (roomIndex < 0.8) utilizationFactor = 0.4;
+                else if (roomIndex < 1.0) utilizationFactor = 0.45;
+                else if (roomIndex < 1.5) utilizationFactor = 0.5;
+                else if (roomIndex < 2.0) utilizationFactor = 0.55;
+                else if (roomIndex < 2.5) utilizationFactor = 0.6;
+                else if (roomIndex < 3.0) utilizationFactor = 0.65;
+                else utilizationFactor = 0.7;
+                
+                // Get maintenance factor
+                const maintenanceFactor = parseFloat(document.getElementById('maintenance-factor').value);
+                
+                // Calculate required number of luminaires
+                const requiredFlux = (targetIlluminance * roomArea) / (utilizationFactor * maintenanceFactor);
+                const rawLuminaireCount = requiredFlux / luminaireFlux;
+                luminaireCount = Math.ceil(rawLuminaireCount);
+                
+                // Determine layout (rows x columns)
+                const aspectRatio = roomLength / roomWidth;
+                if (aspectRatio > 1.5) {
+                    rows = Math.ceil(Math.sqrt(luminaireCount / aspectRatio));
+                    cols = Math.ceil(luminaireCount / rows);
+                } else {
+                    cols = Math.ceil(Math.sqrt(luminaireCount * aspectRatio));
+                    rows = Math.ceil(luminaireCount / cols);
+                }
+                
+                // Ensure we have at least 1 row and column
+                rows = Math.max(1, rows);
+                cols = Math.max(1, cols);
+                
+                // Calculate actual number of luminaires from rows*cols
+                const actualLuminaireCount = rows * cols;
+                
+                // Calculate achieved illuminance
+                const actualFlux = actualLuminaireCount * luminaireFlux;
+                const achievedIlluminance = Math.round((actualFlux * utilizationFactor * maintenanceFactor) / roomArea);
+                
+                // Calculate power density
+                const totalWattage = actualLuminaireCount * luminaireWattage;
+                const powerDensity = (totalWattage / roomArea).toFixed(1);
+                
+                // Update result fields
+                document.getElementById('luminaire-count').textContent = `${actualLuminaireCount} units`;
+                document.getElementById('luminaire-layout').textContent = `${rows} × ${cols} grid`;
+                document.getElementById('achieved-illuminance').textContent = `${achievedIlluminance} lux`;
+                document.getElementById('power-density').textContent = `${powerDensity} W/m²`;
+                document.getElementById('total-lighting-load').textContent = `${totalWattage} W`;
+                
+                // Draw room with luminaires
+                drawRoom(roomLength, roomWidth, actualLuminaireCount, rows, cols);
+                
+                // Show results
+                lightingDesignResult.classList.add('active');
+                
+                // Hide loading spinner
+                lightingSpinner.style.display = 'none';
+                
+                // Remove pulse animation
+                calculateLightingBtn.classList.remove('pulse-animation');
+            }, 1500);
+        });
+        
+        resetLightingBtn.addEventListener('click', () => {
+            // Reset form fields
+            document.getElementById('room-length').value = '6';
+            document.getElementById('room-width').value = '4';
+            document.getElementById('ceiling-height').value = '2.8';
+            document.getElementById('work-plane').value = '0.8';
+            document.getElementById('target-illuminance').value = '300';
+            
+            // Hide results
+            lightingDesignResult.classList.remove('active');
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, roomCanvas.width, roomCanvas.height);
+        });
+
+        // Fault Calculation
+        const calculateFaultBtn = document.getElementById('calculate-fault');
+        const resetFaultBtn = document.getElementById('reset-fault');
+        const faultCalculationResult = document.getElementById('fault-calculation-result');
+        const faultDiagram = document.getElementById('fault-diagram');
+        const faultSpinner = document.getElementById('fault-spinner');
+        
+        // Draw fault diagram
+        function drawFaultDiagram(faultType, faultLocation, faultCurrent) {
+            // Clear previous diagram
+            faultDiagram.innerHTML = '<div class="loading-spinner" id="fault-spinner"></div>';
+            faultSpinner.style.display = 'none';
+            
+            // Get theme variables for colors
+            const isDarkTheme = document.documentElement.getAttribute('data-theme') === 'dark';
+            const textColor = isDarkTheme ? '#e5e7eb' : '#111827';
+            const lineColor = isDarkTheme ? '#6366f1' : '#4f46e5';
+            const backgroundColor = isDarkTheme ? '#1f2937' : '#ffffff';
+            
+            // Create SVG element
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('width', '100%');
+            svg.setAttribute('height', '100%');
+            svg.setAttribute('viewBox', '0 0 400 180');
+            
+            // Draw transformer
+            const transformer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            
+            // Transformer symbols (two circles)
+            const circle1 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle1.setAttribute('cx', '50');
+            circle1.setAttribute('cy', '90');
+            circle1.setAttribute('r', '20');
+            circle1.setAttribute('fill', 'none');
+            circle1.setAttribute('stroke', lineColor);
+            circle1.setAttribute('stroke-width', '2');
+            
+            const circle2 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle2.setAttribute('cx', '90');
+            circle2.setAttribute('cy', '90');
+            circle2.setAttribute('r', '20');
+            circle2.setAttribute('fill', 'none');
+            circle2.setAttribute('stroke', lineColor);
+            circle2.setAttribute('stroke-width', '2');
+            
+            transformer.appendChild(circle1);
+            transformer.appendChild(circle2);
+            
+            // Transformer label
+            const transformerLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            transformerLabel.setAttribute('x', '70');
+            transformerLabel.setAttribute('y', '130');
+            transformerLabel.setAttribute('text-anchor', 'middle');
+            transformerLabel.setAttribute('fill', textColor);
+            transformerLabel.setAttribute('font-family', 'Inter, sans-serif');
+            transformerLabel.setAttribute('font-size', '12');
+            transformerLabel.textContent = 'Transformer';
+            
+            // Main distribution line
+            const mainLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            mainLine.setAttribute('x1', '110');
+            mainLine.setAttribute('y1', '90');
+            mainLine.setAttribute('x2', '350');
+            mainLine.setAttribute('y2', '90');
+            mainLine.setAttribute('stroke', lineColor);
+            mainLine.setAttribute('stroke-width', '3');
+            
+            svg.appendChild(transformer);
+            svg.appendChild(transformerLabel);
+            svg.appendChild(mainLine);
+            
+            // Add distribution boards based on fault location
+            let faultX = 0;
+            let faultY = 0;
+            
+            if (faultLocation === 'main-db' || faultLocation === 'sub-db') {
+                // Main DB
+                const mainDB = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                mainDB.setAttribute('x', '150');
+                mainDB.setAttribute('y', '70');
+                mainDB.setAttribute('width', '40');
+                mainDB.setAttribute('height', '40');
+                mainDB.setAttribute('fill', 'none');
+                mainDB.setAttribute('stroke', lineColor);
+                mainDB.setAttribute('stroke-width', '2');
+                
+                const mainDBLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                mainDBLabel.setAttribute('x', '170');
+                mainDBLabel.setAttribute('y', '130');
+                mainDBLabel.setAttribute('text-anchor', 'middle');
+                mainDBLabel.setAttribute('fill', textColor);
+                mainDBLabel.setAttribute('font-family', 'Inter, sans-serif');
+                mainDBLabel.setAttribute('font-size', '12');
+                mainDBLabel.textContent = 'Main DB';
+                
+                svg.appendChild(mainDB);
+                svg.appendChild(mainDBLabel);
+                
+                if (faultLocation === 'main-db') {
+                    faultX = 170;
+                    faultY = 90;
+                }
+            }
+            
+            if (faultLocation === 'sub-db' || faultLocation === 'final-circuit' || faultLocation === 'equipment') {
+                // Sub DB
+                const subDB = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                subDB.setAttribute('x', '250');
+                subDB.setAttribute('y', '70');
+                subDB.setAttribute('width', '30');
+                subDB.setAttribute('height', '40');
+                subDB.setAttribute('fill', 'none');
+                subDB.setAttribute('stroke', lineColor);
+                subDB.setAttribute('stroke-width', '2');
+                
+                const subDBLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                subDBLabel.setAttribute('x', '265');
+                subDBLabel.setAttribute('y', '130');
+                subDBLabel.setAttribute('text-anchor', 'middle');
+                subDBLabel.setAttribute('fill', textColor);
+                subDBLabel.setAttribute('font-family', 'Inter, sans-serif');
+                subDBLabel.setAttribute('font-size', '12');
+                subDBLabel.textContent = 'Sub DB';
+                
+                svg.appendChild(subDB);
+                svg.appendChild(subDBLabel);
+                
+                if (faultLocation === 'sub-db') {
+                    faultX = 265;
+                    faultY = 90;
+                }
+            }
+            
+            if (faultLocation === 'final-circuit' || faultLocation === 'equipment') {
+                // Final circuit line
+                const finalLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                finalLine.setAttribute('x1', '280');
+                finalLine.setAttribute('y1', '90');
+                finalLine.setAttribute('x2', '330');
+                finalLine.setAttribute('y2', '50');
+                finalLine.setAttribute('stroke', lineColor);
+                finalLine.setAttribute('stroke-width', '2');
+                
+                const finalCircuitLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                finalCircuitLabel.setAttribute('x', '330');
+                finalCircuitLabel.setAttribute('y', '40');
+                finalCircuitLabel.setAttribute('text-anchor', 'middle');
+                finalCircuitLabel.setAttribute('fill', textColor);
+                finalCircuitLabel.setAttribute('font-family', 'Inter, sans-serif');
+                finalCircuitLabel.setAttribute('font-size', '12');
+                finalCircuitLabel.textContent = 'Final Circuit';
+                
+                svg.appendChild(finalLine);
+                svg.appendChild(finalCircuitLabel);
+                
+                if (faultLocation === 'final-circuit') {
+                    faultX = 310;
+                    faultY = 65;
+                }
+            }
+            
+            if (faultLocation === 'equipment') {
+                // Equipment
+                const equipment = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                equipment.setAttribute('x', '320');
+                equipment.setAttribute('y', '20');
+                equipment.setAttribute('width', '30');
+                equipment.setAttribute('height', '20');
+                equipment.setAttribute('fill', 'none');
+                equipment.setAttribute('stroke', lineColor);
+                equipment.setAttribute('stroke-width', '2');
+                
+                const equipmentLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                equipmentLabel.setAttribute('x', '335');
+                equipmentLabel.setAttribute('y', '10');
+                equipmentLabel.setAttribute('text-anchor', 'middle');
+                equipmentLabel.setAttribute('fill', textColor);
+                equipmentLabel.setAttribute('font-family', 'Inter, sans-serif');
+                equipmentLabel.setAttribute('font-size', '12');
+                equipmentLabel.textContent = 'Equipment';
+                
+                svg.appendChild(equipment);
+                svg.appendChild(equipmentLabel);
+                
+                faultX = 335;
+                faultY = 30;
+            }
+            
+            // Draw fault symbol
+            if (faultX > 0 && faultY > 0) {
+                // Fault symbol depends on fault type
+                if (faultType === 'short-circuit') {
+                    // Lightning bolt for short circuit
+                    const bolt = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    bolt.setAttribute('d', `M${faultX-8},${faultY-12} L${faultX+2},${faultY-2} L${faultX-4},${faultY-2} L${faultX+8},${faultY+12} L${faultX-2},${faultY+2} L${faultX+4},${faultY+2} Z`);
+                    bolt.setAttribute('fill', '#ef4444');
+                    bolt.setAttribute('stroke', '#b91c1c');
+                    bolt.setAttribute('stroke-width', '1');
+                    
+                    // Add animation
+                    const animate = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
+                    animate.setAttribute('attributeName', 'opacity');
+                    animate.setAttribute('values', '1;0.6;1');
+                    animate.setAttribute('dur', '1s');
+                    animate.setAttribute('repeatCount', 'indefinite');
+                    bolt.appendChild(animate);
+                    
+                    svg.appendChild(bolt);
+                } else if (faultType === 'earth-fault') {
+                    // Earth fault symbol (ground symbol with strike)
+                    const earthSymbol = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    
+                    // Ground symbol
+                    const ground1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    ground1.setAttribute('x1', faultX - 10);
+                    ground1.setAttribute('y1', faultY);
+                    ground1.setAttribute('x2', faultX + 10);
+                    ground1.setAttribute('y2', faultY);
+                    ground1.setAttribute('stroke', '#ef4444');
+                    ground1.setAttribute('stroke-width', '2');
+                    
+                    const ground2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    ground2.setAttribute('x1', faultX - 6);
+                    ground2.setAttribute('y1', faultY + 4);
+                    ground2.setAttribute('x2', faultX + 6);
+                    ground2.setAttribute('y2', faultY + 4);
+                    ground2.setAttribute('stroke', '#ef4444');
+                    ground2.setAttribute('stroke-width', '2');
+                    
+                    const ground3 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    ground3.setAttribute('x1', faultX - 2);
+                    ground3.setAttribute('y1', faultY + 8);
+                    ground3.setAttribute('x2', faultX + 2);
+                    ground3.setAttribute('y2', faultY + 8);
+                    ground3.setAttribute('stroke', '#ef4444');
+                    ground3.setAttribute('stroke-width', '2');
+                    
+                    // Fault line (diagonal strike)
+                    const faultLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    faultLine.setAttribute('x1', faultX - 12);
+                    faultLine.setAttribute('y1', faultY - 12);
+                    faultLine.setAttribute('x2', faultX + 12);
+                    faultLine.setAttribute('y2', faultY + 12);
+                    faultLine.setAttribute('stroke', '#ef4444');
+                    faultLine.setAttribute('stroke-width', '2');
+                    
+                    // Add animation
+                    const animate = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
+                    animate.setAttribute('attributeName', 'stroke-width');
+                    animate.setAttribute('values', '2;3;2');
+                    animate.setAttribute('dur', '1s');
+                    animate.setAttribute('repeatCount', 'indefinite');
+                    faultLine.appendChild(animate);
+                    
+                    earthSymbol.appendChild(ground1);
+                    earthSymbol.appendChild(ground2);
+                    earthSymbol.appendChild(ground3);
+                    earthSymbol.appendChild(faultLine);
+                    
+                    svg.appendChild(earthSymbol);
+                } else {
+                    // Default fault symbol (circle with X)
+                    const faultCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    faultCircle.setAttribute('cx', faultX);
+                    faultCircle.setAttribute('cy', faultY);
+                    faultCircle.setAttribute('r', '12');
+                    faultCircle.setAttribute('fill', 'none');
+                    faultCircle.setAttribute('stroke', '#ef4444');
+                    faultCircle.setAttribute('stroke-width', '2');
+                    
+                    const xLine1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    xLine1.setAttribute('x1', faultX - 6);
+                    xLine1.setAttribute('y1', faultY - 6);
+                    xLine1.setAttribute('x2', faultX + 6);
+                    xLine1.setAttribute('y2', faultY + 6);
+                    xLine1.setAttribute('stroke', '#ef4444');
+                    xLine1.setAttribute('stroke-width', '2');
+                    
+                    const xLine2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    xLine2.setAttribute('x1', faultX + 6);
+                    xLine2.setAttribute('y1', faultY - 6);
+                    xLine2.setAttribute('x2', faultX - 6);
+                    xLine2.setAttribute('y2', faultY + 6);
+                    xLine2.setAttribute('stroke', '#ef4444');
+                    xLine2.setAttribute('stroke-width', '2');
+                    
+                    // Add animation
+                    const animate = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
+                    animate.setAttribute('attributeName', 'stroke-width');
+                    animate.setAttribute('values', '2;3;2');
+                    animate.setAttribute('dur', '1s');
+                    animate.setAttribute('repeatCount', 'indefinite');
+                    faultCircle.appendChild(animate);
+                    
+                    svg.appendChild(faultCircle);
+                    svg.appendChild(xLine1);
+                    svg.appendChild(xLine2);
+                }
+                
+                // Add fault current value
+                const faultCurrentLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                faultCurrentLabel.setAttribute('x', faultX);
+                faultCurrentLabel.setAttribute('y', faultY + 30);
+                faultCurrentLabel.setAttribute('text-anchor', 'middle');
+                faultCurrentLabel.setAttribute('fill', '#ef4444');
+                faultCurrentLabel.setAttribute('font-family', 'Inter, sans-serif');
+                faultCurrentLabel.setAttribute('font-weight', 'bold');
+                faultCurrentLabel.setAttribute('font-size', '14');
+                faultCurrentLabel.textContent = `${faultCurrent} kA`;
+                
+                svg.appendChild(faultCurrentLabel);
+            }
+            
+            // Add diagram to container
+            faultDiagram.appendChild(svg);
+        }
+        
+        calculateFaultBtn.addEventListener('click', () => {
+            // Show loading spinner
+            faultSpinner.style.display = 'block';
+            
+            // Add pulse animation to button
+            calculateFaultBtn.classList.add('pulse-animation');
+            
+            // Simulate calculation delay
+            setTimeout(() => {
+                // Get form values
+                const faultType = document.getElementById('fault-type').value;
+                const systemVoltage = parseFloat(document.getElementById('system-voltage').value);
+                const faultLocation = document.getElementById('fault-location').value;
+                const transformerRating = parseFloat(document.getElementById('transformer-rating').value);
+                const transformerImpedance = parseFloat(document.getElementById('transformer-impedance').value);
+                const cableLength = parseFloat(document.getElementById('cable-length-fault').value);
+                const cableSize = parseFloat(document.getElementById('cable-size-fault').value);
+                const gridContribution = parseFloat(document.getElementById('grid-contribution').value);
+                
+                // Calculate fault current (simplified calculation for demonstration)
+                let faultCurrent;
+                
+                // Base value from transformer and grid
+                const baseContribution = (100 * transformerRating) / (Math.sqrt(3) * systemVoltage * transformerImpedance / 1000);
+                
+                // Adjust for cable impedance and fault location
+                let locationFactor;
+                switch (faultLocation) {
+                    case 'main-db': locationFactor = 0.95; break;
+                    case 'sub-db': locationFactor = 0.9; break;
+                    case 'final-circuit': locationFactor = 0.8; break;
+                    case 'equipment': locationFactor = 0.7; break;
+                    default: locationFactor = 0.9;
+                }
+                
+                // Cable impedance factor (simplified)
+                const cableImpedanceFactor = 1 - ((cableLength / 100) * (10 / cableSize));
+                
+                // Adjust for fault type
+                let faultTypeFactor;
+                switch (faultType) {
+                    case 'short-circuit': faultTypeFactor = 1.0; break;
+                    case 'earth-fault': faultTypeFactor = 0.8; break;
+                    case 'phase-fault': faultTypeFactor = 0.87; break;
+                    case 'arc-fault': faultTypeFactor = 0.6; break;
+                    default: faultTypeFactor = 1.0;
+                }
+                
+                // Calculate prospective fault current
+                faultCurrent = (baseContribution * locationFactor * cableImpedanceFactor * faultTypeFactor / 1000).toFixed(1);
+                
+                // Calculate thermal stress
+                const thermalStress = (Math.pow(parseFloat(faultCurrent), 2) * 0.15).toFixed(1);
+                
+                // Calculate minimum breaking capacity
+                const breakingCapacity = Math.ceil(parseFloat(faultCurrent) * 1.25 / 5) * 5;
+                
+                // Calculate fault clearance time
+                let clearanceTime;
+                if (parseFloat(faultCurrent) > 20) {
+                    clearanceTime = 0.08;
+                } else if (parseFloat(faultCurrent) > 10) {
+                    clearanceTime = 0.1;
+                } else if (parseFloat(faultCurrent) > 5) {
+                    clearanceTime = 0.12;
+                } else {
+                    clearanceTime = 0.15;
+                }
+                
+                // Update result fields
+                document.getElementById('fault-current').textContent = `${faultCurrent} kA`;
+                document.getElementById('thermal-stress').textContent = `${thermalStress} kA² s`;
+                document.getElementById('breaking-capacity').textContent = `${breakingCapacity} kA`;
+                document.getElementById('clearance-time').textContent = `${clearanceTime.toFixed(2)} s`;
+                
+                // Draw fault diagram
+                drawFaultDiagram(faultType, faultLocation, faultCurrent);
+                
+                // Show results
+                faultCalculationResult.classList.add('active');
+                
+                // Remove pulse animation
+                calculateFaultBtn.classList.remove('pulse-animation');
+            }, 1200);
+        });
+        
+        resetFaultBtn.addEventListener('click', () => {
+            // Reset form fields
+            document.getElementById('transformer-rating').value = '500';
+            document.getElementById('transformer-impedance').value = '5';
+            document.getElementById('cable-length-fault').value = '50';
+            document.getElementById('grid-contribution').value = '15';
+            
+            // Hide results
+            faultCalculationResult.classList.remove('active');
+            
+            // Clear fault diagram
+            faultDiagram.innerHTML = '<div class="loading-spinner" id="fault-spinner"></div>';
+        });
+
+        // Initial draw of lighting room
+        drawRoom(6, 4, 0, 0, 0);
+    </script>
+</body>
+</html>
